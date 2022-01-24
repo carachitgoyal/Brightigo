@@ -30,9 +30,20 @@ module.exports = {
         ],
       },
       {
+        test: /\.(eot|woff|woff2|svg|ttf)([\?]?.*)$/,
+        use: ['file-loader'],
+      },
+      {
         test: /\.(png|woff|woff2|eot|ttf|svg)$/,
         use: [{ loader: 'url-loader', options: { limit: 100000 } }],
       },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i, 
+        loader: 'file-loader',
+        options: {
+          name: '/public/Images/[name].[ext]'
+        }
+    }
       {
         test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
         use: [
