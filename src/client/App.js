@@ -5,6 +5,8 @@ import theme from './Theme';
 import NavBar from './Components/NavBar/Nav';
 import Home from './Pages/Home';
 import Course from './Pages/Course';
+import Login from './Pages/Login';
+import Signup from './Pages/Signup';
 
 export const newTheme = {
   ...theme,
@@ -26,6 +28,8 @@ const App = () => {
         <Route path='/' element={<Navigate replace to='/course' />} />
         <Route path='/home' element={<Home />} />
         <Route path='/course' element={<Course />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/register' element={<Signup />} />
         {/*     <Route path='/price-list' element={<PriceList />} />
          <Route path='/contact' element={<ContactUS />} />
         <Route path='/book-collection' element={<BookCollection />} />

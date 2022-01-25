@@ -1,9 +1,22 @@
 import React from 'react';
-import { Box, Flex, Text, Button, Stack, Center } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  Text,
+  Button,
+  Stack,
+  Center,
+  useMediaQuery,
+} from '@chakra-ui/react';
 import { Link, NavigationType, useNavigate } from 'react-router-dom';
+import UserProfile from './UserProfile';
 
 const NavBar = (props) => {
   const [isOpen, setIsOpen] = React.useState(false);
+
+  const isLogedIn = false;
+
+  const [isSmallScreen] = useMediaQuery('(max-width: 768px)');
 
   const toggle = () => setIsOpen(!isOpen);
 
@@ -21,22 +34,30 @@ const NavBar = (props) => {
         >
           BRIGHTIGO
         </Text>
-        <Button
-          display={{ base: 'block', md: 'none' }}
-          size='md'
-          rounded='none'
-          color={['primary.500', 'primary.500', 'white', 'white']}
-          bg={'purple.800'}
-          _hover={{
-            bg: '#FAF5FF',
-            outline: '2px solid #543B99',
-            color: '#543B99',
-          }}
-        >
-          Register
-        </Button>
+        {isLogedIn && isSmallScreen ? (
+          <UserProfile />
+        ) : (
+          <Button
+            display={{ base: 'block', md: 'none' }}
+            size='md'
+            rounded='none'
+            color={['primary.500', 'primary.500', 'white', 'white']}
+            bg={'purple.800'}
+            _hover={{
+              bg: '#FAF5FF',
+              outline: '2px solid #543B99',
+              color: '#543B99',
+            }}
+          >
+            Register
+          </Button>
+        )}
         <MenuToggle toggle={toggle} isOpen={isOpen} />
-        <MenuLinks isOpen={isOpen} />
+        <MenuLinks
+          isOpen={isOpen}
+          isLogedIn={isLogedIn}
+          isSmallScreen={isSmallScreen}
+        />
       </NavBarContainer>
     </Center>
   );
@@ -82,7 +103,7 @@ const MenuItem = ({ children, isLast, to = '/', ...rest }) => {
   );
 };
 
-const MenuLinks = ({ isOpen }) => {
+const MenuLinks = ({ isOpen, isLogedIn, isSmallScreen }) => {
   return (
     <Box
       display={{ base: isOpen ? 'block' : 'none', md: 'block' }}
@@ -99,22 +120,30 @@ const MenuLinks = ({ isOpen }) => {
       >
         <MenuItem to='/home'>Home</MenuItem>
         <MenuItem to='/course'>Course </MenuItem>
-        <MenuItem to='/login'>Login </MenuItem>
-        <MenuItem to='/register' display={{ base: 'none', md: 'block' }} isLast>
-          <Button
-            size='lg'
-            rounded='0'
-            color={'white'}
-            bg={'purple.800'}
-            _hover={{
-              bg: '#FAF5FF',
-              outline: '2px solid #543B99',
-              color: '#543B99',
-            }}
+        {!isLogedIn && <MenuItem to='/login'>Login </MenuItem>}
+        {isLogedIn ? (
+          !isSmallScreen && <UserProfile />
+        ) : (
+          <MenuItem
+            to='/register'
+            display={{ base: 'none', md: 'block' }}
+            isLast
           >
-            Register
-          </Button>
-        </MenuItem>
+            <Button
+              size='lg'
+              rounded='0'
+              color={'white'}
+              bg={'purple.800'}
+              _hover={{
+                bg: '#FAF5FF',
+                outline: '2px solid #543B99',
+                color: '#543B99',
+              }}
+            >
+              Register
+            </Button>
+          </MenuItem>
+        )}
       </Stack>
     </Box>
   );
