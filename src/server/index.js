@@ -7,6 +7,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const User = require('./Model/user');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 app.use(bodyParser.json());
@@ -23,12 +24,38 @@ mongoose
   });
 
 app.use(express.static('dist'));
-app.get('/api/getUsername', (req, res) => {
-  res.send({ username: 'Irfan Asif' });
+
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email }).lean();
+
+  if (!user) {
+    return res.json({
+      status: 'error',
+      at: 'email',
+      error: 'Email Does not exist',
+    });
+  }
+
+  if (await bcrypt.compare(password, user.password)) {
+    // the email, password combination is successful
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET
+    );
+    return res.json({ status: 'ok', data: token });
+  }
+
+  // user exists but password is wrong
+  res.json({ status: 'error', at: 'password', error: 'Wrong Password' });
 });
 
 app.post('/api/createUser', async (req, res) => {
   const { username, email, password: plainTextPassword } = req.body;
+
+  if (!email || typeof username !== 'string') {
+    return res.json({ status: 'error' });
+  }
 
   const password = await bcrypt.hash(plainTextPassword, 10);
 
@@ -40,8 +67,11 @@ app.post('/api/createUser', async (req, res) => {
     });
     console.log('user created successfully', response);
   } catch (error) {
-    console.log(error);
-    return res.json({ status: 'error' });
+    if (error.code === 11000) {
+      //11000 is duplicate key error
+      return res.json({ status: 'error', error: 'Email already exists' });
+    }
+    throw error;
   }
 
   res.json({ status: 'ok' });

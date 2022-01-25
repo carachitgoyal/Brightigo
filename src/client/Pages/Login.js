@@ -35,26 +35,69 @@ const AlertPop = (props) => {
 
 const Login = () => {
   const [showPassword, setShowPassword] = React.useState(false);
-  const [data, setData] = useState();
   const toast = useToast();
 
   const {
     handleSubmit,
     register,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm();
 
   const onSubmit = (data) => {
-    toast({
-      title: 'Login Successful',
-      status: 'success',
-      duration: 2000,
-    });
-    // useEffect(() => {
-    //   fetch('./api/')
-    // }, [data]);
-    
+    // toast({
+    //   title: 'Signup Successful',
+    //   status: 'success',
+    //   duration: 2000,
+    // });
     console.log(data);
+
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    };
+    fetch('/api/login', requestOptions)
+      .then(async (response) => {
+        const isJson = response.headers
+          .get('content-type')
+          ?.includes('application/json');
+        const serverResponse = isJson && (await response.json());
+        if (
+          serverResponse.status === 'error' &&
+          serverResponse.at === 'email'
+        ) {
+          setError('email', {
+            type: 'server',
+            message: serverResponse.error,
+          });
+          console.log(setError);
+          toast({
+            title: serverResponse.error,
+            status: 'error',
+            duration: 2000,
+          });
+        }
+        if (
+          serverResponse.status === 'error' &&
+          serverResponse.at === 'password'
+        ) {
+          setError('password', {
+            type: 'server',
+            message: serverResponse.error,
+          });
+          console.log(setError);
+          toast({
+            title: serverResponse.error,
+            status: 'error',
+            duration: 2000,
+          });
+        }
+      })
+      .catch((error) => {
+        // setError({ responseErrorMessage: error.toString() });
+        console.error('There was an error!', error);
+      });
   };
 
   return (
@@ -129,50 +172,36 @@ const Login = () => {
             isRequired
           >
             <FormLabel fontSize={{ base: 'md', md: 'xl' }}>Password</FormLabel>
-            <Tooltip
-              label='Minimum 8 Charackters, including UPPER/lowercase and numbers'
-              hasArrow
-              arrowSize={8}
-              placement='top'
-              closeOnClick={false}
-              bg='pink.600'
-            >
-              <InputGroup>
-                <Input
-                  mb={'1rem'}
-                  borderRadius={'0'}
-                  bg={'white'}
+            <InputGroup>
+              <Input
+                mb={'1rem'}
+                borderRadius={'0'}
+                bg={'white'}
+                size={'lg'}
+                type={showPassword ? 'text' : 'password'}
+                placeholder='Password'
+                {...register('password', {
+                  required: 'Please enter Password',
+                })}
+              />
+              <InputRightElement>
+                <Box
+                  flex={'1'}
+                  mt={'6px'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                  h='1.5rem'
                   size={'lg'}
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder='Password'
-                  {...register('password', {
-                    required: 'Please enter Password',
-                    minLength: { value: 8, message: 'Minimum 8 Characters' },
-                    pattern: {
-                      value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15}$/,
-                      message: 'Use a strong password',
-                    },
-                  })}
-                />
-                <InputRightElement>
-                  <Box
-                    flex={'1'}
-                    mt={'6px'}
-                    alignItems={'center'}
-                    justifyContent={'center'}
-                    h='1.5rem'
-                    size={'lg'}
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <ViewOffIcon w={6} h={6} color={'purple.600'} />
-                    ) : (
-                      <ViewIcon w={6} h={6} color={'purple.600'} />
-                    )}
-                  </Box>
-                </InputRightElement>
-              </InputGroup>
-            </Tooltip>
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <ViewOffIcon w={6} h={6} color={'purple.600'} />
+                  ) : (
+                    <ViewIcon w={6} h={6} color={'purple.600'} />
+                  )}
+                </Box>
+              </InputRightElement>
+            </InputGroup>
             {errors.password && <AlertPop title={errors.password.message} />}
           </FormControl>
           <Button
@@ -186,12 +215,16 @@ const Login = () => {
             color={'white'}
             bg={'purple.800'}
             _hover={{
-              bg: '#FAF5FF',
-              outline: '2px solid #543B99',
-              color: '#543B99',
+              bg: '#543B99',
+              color: 'white',
             }}
+            _active={{
+              bg: '#543B99',
+              color: 'white',
+            }}
+            isLoading={isSubmitting}
           >
-            Login
+            Get Started
           </Button>
         </form>
         <Text fontSize={'sm'} py={'1rem'}>

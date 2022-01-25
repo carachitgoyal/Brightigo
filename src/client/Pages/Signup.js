@@ -36,21 +36,21 @@ const AlertPop = (props) => {
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState({ responseErrorMessage: '' });
   const toast = useToast();
 
   const {
     handleSubmit,
     register,
+    setError,
     formState: { errors, isSubmitting },
-  } = useForm();
+  } = useForm({ defaultValues: { email: '' } });
 
   const onSubmit = (data) => {
-    toast({
-      title: 'Signup Successful',
-      status: 'success',
-      duration: 2000,
-    });
+    // toast({
+    //   title: 'Signup Successful',
+    //   status: 'success',
+    //   duration: 2000,
+    // });
     console.log(data);
 
     const requestOptions = {
@@ -63,19 +63,22 @@ const Signup = () => {
         const isJson = response.headers
           .get('content-type')
           ?.includes('application/json');
-        const data = isJson && (await response.json());
-
-        // check for error response
-        if (!response.ok) {
-          // get error message from body or default to response status
-          const error = (data && data.message) || response.status;
-          return Promise.reject(error);
+        const serverResponse = isJson && (await response.json());
+        if (serverResponse.status === 'error') {
+          setError('email', {
+            type: 'server',
+            message: serverResponse.error,
+          });
+          console.log(setError);
+          toast({
+            title: serverResponse.error,
+            status: 'error',
+            duration: 2000,
+          });
         }
-
-        //this.setState({ postId: data.id });
       })
       .catch((error) => {
-        setError({ responseErrorMessage: error.toString() });
+        // setError({ responseErrorMessage: error.toString() });
         console.error('There was an error!', error);
       });
   };
@@ -150,6 +153,7 @@ const Signup = () => {
             <Input
               mb={'1rem'}
               type='text'
+              name='email'
               placeholder='Email'
               bg={'white'}
               size={'lg'}
@@ -161,9 +165,11 @@ const Signup = () => {
                     /^(([^<>()\[\]\.,;:\s@"]+(\.[^<>()\[\]\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                   message: 'Enter a valid email',
                 },
+                //   validate: 'server',
               })}
             />
             {errors.email && <AlertPop title={errors.email.message} />}
+            {/*errors.email && <AlertPop title={errors.email} />*/}
           </FormControl>
 
           <FormControl
@@ -229,10 +235,14 @@ const Signup = () => {
             color={'white'}
             bg={'purple.800'}
             _hover={{
-              bg: '#FAF5FF',
-              outline: '2px solid #543B99',
-              color: '#543B99',
+              bg: '#543B99',
+              color: 'white',
             }}
+            _active={{
+              bg: '#543B99',
+              color: 'white',
+            }}
+            isLoading={isSubmitting}
           >
             Get Started
           </Button>
