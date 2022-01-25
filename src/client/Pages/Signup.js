@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { FcGoogle } from 'react-icons/fc';
 import {
@@ -21,6 +21,7 @@ import {
   InputGroup,
   Tooltip,
 } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 
 const AlertPop = (props) => {
   return (
@@ -33,9 +34,9 @@ const AlertPop = (props) => {
   );
 };
 
-const Login = () => {
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [data, setData] = useState();
+const Signup = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState({ responseErrorMessage: '' });
   const toast = useToast();
 
   const {
@@ -46,15 +47,37 @@ const Login = () => {
 
   const onSubmit = (data) => {
     toast({
-      title: 'Login Successful',
+      title: 'Signup Successful',
       status: 'success',
       duration: 2000,
     });
-    // useEffect(() => {
-    //   fetch('./api/')
-    // }, [data]);
-    
     console.log(data);
+
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    };
+    fetch('/api/createUser', requestOptions)
+      .then(async (response) => {
+        const isJson = response.headers
+          .get('content-type')
+          ?.includes('application/json');
+        const data = isJson && (await response.json());
+
+        // check for error response
+        if (!response.ok) {
+          // get error message from body or default to response status
+          const error = (data && data.message) || response.status;
+          return Promise.reject(error);
+        }
+
+        //this.setState({ postId: data.id });
+      })
+      .catch((error) => {
+        setError({ responseErrorMessage: error.toString() });
+        console.error('There was an error!', error);
+      });
   };
 
   return (
@@ -72,7 +95,7 @@ const Login = () => {
       <VStack p={['1rem', '1rem', '2rem']} pb={'4rem'} bgColor={'#fefbff'}>
         <Center my={'1rem'} flexDirection={'column'}>
           <Heading fontWeight={'400'} mb={'0.5rem'} letterSpacing={'wider'}>
-            Login
+            Signup
           </Heading>
           <Center py={[2, 2, 4]} w={'full'}>
             <Button
@@ -91,13 +114,33 @@ const Login = () => {
                 fontSize={{ base: 'md', md: 'lg' }}
                 pl={'0.5rem'}
               >
-                <Text textColor={'gray.500'}>login with Google</Text>
+                <Text textColor={'gray.500'}>Signup with Google</Text>
               </Center>
             </Button>
           </Center>
-          <Text fontSize={'sm'}> or login with registered email </Text>
+          <Text fontSize={'sm'}> or Signup with registered email </Text>
         </Center>
         <form onSubmit={handleSubmit(onSubmit)}>
+          <FormControl
+            pt={'1rem'}
+            w={{ base: '15rem', sm: '18rem', md: '25rem' }}
+            isRequired
+          >
+            <FormLabel fontSize={{ base: 'md', md: 'xl' }}>Full Name</FormLabel>
+            <Input
+              mb={'1rem'}
+              type='text'
+              placeholder='Full Name'
+              bg={'white'}
+              size={'lg'}
+              borderRadius={'0'}
+              {...register('username', {
+                required: 'Please enter Password',
+                minLength: { value: 4, message: 'Too Short' },
+              })}
+            />
+            {errors.name && <AlertPop title={errors.name.message} />}
+          </FormControl>
           <FormControl
             pt={'1rem'}
             w={{ base: '15rem', sm: '18rem', md: '25rem' }}
@@ -191,15 +234,18 @@ const Login = () => {
               color: '#543B99',
             }}
           >
-            Login
+            Get Started
           </Button>
         </form>
         <Text fontSize={'sm'} py={'1rem'}>
           {' '}
-          Forgot Password{' '}
+          Already Have an account{' '}
+          <Text as='span' textColor={'blue.400'} fontWeight={'500'}>
+            <Link to='/login'>Login</Link>
+          </Text>{' '}
         </Text>
       </VStack>
     </Container>
   );
 };
-export default Login;
+export default Signup;
