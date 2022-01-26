@@ -34,7 +34,7 @@ const AlertPop = (props) => {
   );
 };
 
-const Login = () => {
+const ForgotPassword = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const toast = useToast();
 
@@ -58,7 +58,7 @@ const Login = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     };
-    fetch('/api/login', requestOptions)
+    fetch('/api/reset-password', requestOptions)
       .then(async (response) => {
         const isJson = response.headers
           .get('content-type')
@@ -116,33 +116,14 @@ const Login = () => {
       <VStack p={['1rem', '1rem', '2rem']} pb={'4rem'} bgColor={'#fefbff'}>
         <Center my={'1rem'} flexDirection={'column'}>
           <Heading fontWeight={'400'} mb={'0.5rem'} letterSpacing={'wider'}>
-            Login
+            Reset Password
           </Heading>
-          <Center py={[2, 2, 4]} w={'full'}>
-            <Button
-              px={16}
-              border={'none'}
-              borderRadius={'0'}
-              w={{ base: '15rem', sm: '18rem', md: '25rem' }}
-              h={'3.5em'}
-              maxW={'md'}
-              variant={'outline'}
-              leftIcon={<FcGoogle size='1.85em' />}
-              bg={'white'}
-              _hover={{
-                bgColor: 'gray.100',
-              }}
-            >
-              <Center
-                fontWeight={'500'}
-                fontSize={{ base: 'md', md: 'lg' }}
-                pl={'0.5rem'}
-              >
-                <Text textColor={'gray.500'}>login with Google</Text>
-              </Center>
-            </Button>
-          </Center>
-          <Text fontSize={'sm'}> or login with registered email </Text>
+          <Center py={[2, 2, 4]} w={'full'}></Center>
+          <Text fontSize={'sm'} maxW={'25rem'} textAlign={'center'}>
+            {' '}
+            Enter the email address you've used to register with us and we'll
+            send you a reset link!
+          </Text>
         </Center>
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormControl
@@ -154,7 +135,7 @@ const Login = () => {
             <Input
               mb={'1rem'}
               type='text'
-              placeholder='Email'
+              placeholder='@'
               bg={'white'}
               size={'lg'}
               borderRadius={'0'}
@@ -168,45 +149,6 @@ const Login = () => {
               })}
             />
             {errors.email && <AlertPop title={errors.email.message} />}
-          </FormControl>
-
-          <FormControl
-            py={'1rem'}
-            w={{ base: '15rem', sm: '18rem', md: '25rem' }}
-            isRequired
-          >
-            <FormLabel fontSize={{ base: 'md', md: 'xl' }}>Password</FormLabel>
-            <InputGroup>
-              <Input
-                mb={'1rem'}
-                borderRadius={'0'}
-                bg={'white'}
-                size={'lg'}
-                type={showPassword ? 'text' : 'password'}
-                placeholder='Password'
-                {...register('password', {
-                  required: 'Please enter Password',
-                })}
-              />
-              <InputRightElement>
-                <Box
-                  flex={'1'}
-                  mt={'6px'}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                  h='1.5rem'
-                  size={'lg'}
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <ViewOffIcon w={6} h={6} color={'purple.600'} />
-                  ) : (
-                    <ViewIcon w={6} h={6} color={'purple.600'} />
-                  )}
-                </Box>
-              </InputRightElement>
-            </InputGroup>
-            {errors.password && <AlertPop title={errors.password.message} />}
           </FormControl>
           <Button
             mt={'1rem'}
@@ -228,17 +170,17 @@ const Login = () => {
             }}
             isLoading={isSubmitting}
           >
-            Login
+            Get Reset Link
           </Button>
         </form>
-        <Link to='/reset-password'>
+        <Link to='/login'>
           <Text fontSize={'sm'} py={'1rem'}>
             {' '}
-            Forgot Password{' '}
+            Back to Login{' '}
           </Text>
         </Link>
       </VStack>
     </Container>
   );
 };
-export default Login;
+export default ForgotPassword;
