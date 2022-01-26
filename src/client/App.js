@@ -7,6 +7,7 @@ import Home from './Pages/Home';
 import Course from './Pages/Course';
 import Login from './Pages/Login';
 import Signup from './Pages/Signup';
+import ForgotPassword from './Pages/ForgotPassword';
 
 export const newTheme = {
   ...theme,
@@ -30,6 +31,7 @@ const App = () => {
         <Route path='/course' element={<Course />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Signup />} />
+        <Route path='/reset-password' element={<ForgotPassword />} />
         {/*     <Route path='/price-list' element={<PriceList />} />
          <Route path='/contact' element={<ContactUS />} />
         <Route path='/book-collection' element={<BookCollection />} />
