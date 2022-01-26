@@ -41,11 +41,7 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         loader: 'file-loader',
         options: {
-<<<<<<< HEAD
-          name: '/public/Images/[name].[ext]',
-=======
           name: 'public/Images/[name].[ext]',
->>>>>>> development
         },
       },
       {
