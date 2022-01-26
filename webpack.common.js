@@ -1,6 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+
 const outputDirectory = 'dist';
 
 module.exports = {
@@ -64,6 +66,7 @@ module.exports = {
   devServer: {
     port: 3000,
     open: false,
+    hot: true,
     historyApiFallback: true,
     proxy: {
       '/api': 'http://localhost:8080',
@@ -75,5 +78,6 @@ module.exports = {
       template: './public/index.html',
       favicon: './public/favicon.ico',
     }),
+    new ReactRefreshWebpackPlugin(),
   ],
 };
