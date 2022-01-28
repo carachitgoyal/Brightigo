@@ -1,5 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
@@ -9,8 +11,10 @@ module.exports = {
   entry: ['babel-polyfill', './src/client/index.js'],
   output: {
     path: path.join(__dirname, outputDirectory),
+    publicPath: '/',
     filename: 'bundle.js',
   },
+
   module: {
     rules: [
       {
@@ -63,15 +67,6 @@ module.exports = {
   resolve: {
     extensions: ['*', '.js', '.jsx'],
   },
-  devServer: {
-    port: 3000,
-    open: false,
-    hot: true,
-    historyApiFallback: true,
-    proxy: {
-      '/api': 'http://localhost:8080',
-    },
-  },
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
@@ -79,5 +74,7 @@ module.exports = {
       favicon: './public/favicon.ico',
     }),
     new ReactRefreshWebpackPlugin(),
+    new Dotenv(),
+    new NodePolyfillPlugin(),
   ],
 };

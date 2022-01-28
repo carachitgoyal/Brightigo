@@ -1,7 +1,5 @@
 import { useForm } from 'react-hook-form';
 import React, { useState, useEffect } from 'react';
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
-import { FcGoogle } from 'react-icons/fc';
 import {
   FormLabel,
   FormControl,
@@ -10,18 +8,15 @@ import {
   Text,
   Button,
   Center,
-  Box,
   Container,
   Alert,
   AlertIcon,
   AlertTitle,
   VStack,
   useToast,
-  InputRightElement,
-  InputGroup,
-  Tooltip,
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const AlertPop = (props) => {
   return (
@@ -35,7 +30,6 @@ const AlertPop = (props) => {
 };
 
 const ForgotPassword = () => {
-  const [showPassword, setShowPassword] = React.useState(false);
   const toast = useToast();
 
   const {
@@ -46,58 +40,23 @@ const ForgotPassword = () => {
   } = useForm();
 
   const onSubmit = (data) => {
-    // toast({
-    //   title: 'Signup Successful',
-    //   status: 'success',
-    //   duration: 2000,
-    // });
-    console.log(data);
-
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    };
-    fetch('/api/reset-password', requestOptions)
-      .then(async (response) => {
-        const isJson = response.headers
-          .get('content-type')
-          ?.includes('application/json');
-        const serverResponse = isJson && (await response.json());
-        if (
-          serverResponse.status === 'error' &&
-          serverResponse.at === 'email'
-        ) {
-          setError('email', {
-            type: 'server',
-            message: serverResponse.error,
-          });
-          console.log(setError);
-          toast({
-            title: serverResponse.error,
-            status: 'error',
-            duration: 2000,
-          });
-        }
-        if (
-          serverResponse.status === 'error' &&
-          serverResponse.at === 'password'
-        ) {
-          setError('password', {
-            type: 'server',
-            message: serverResponse.error,
-          });
-          console.log(setError);
-          toast({
-            title: serverResponse.error,
-            status: 'error',
-            duration: 3000,
-          });
-        }
+    console.log('submit - ' + data);
+    axios
+      .post('/api/password/forget', data)
+      .then((res) => {
+        console.log(res);
+        toast({
+          title: 'Please Check Your email',
+          status: 'success',
+          duration: 4000,
+        });
       })
-      .catch((error) => {
-        // setError({ responseErrorMessage: error.toString() });
-        console.error('There was an error!', error);
+      .catch((err) => {
+        console.log(err);
+        setError('password', {
+          type: 'server',
+          message: err,
+        });
       });
   };
 
@@ -135,7 +94,7 @@ const ForgotPassword = () => {
             <Input
               mb={'1rem'}
               type='text'
-              placeholder='@'
+              placeholder='Registered Email'
               bg={'white'}
               size={'lg'}
               borderRadius={'0'}
@@ -144,7 +103,7 @@ const ForgotPassword = () => {
                 pattern: {
                   value:
                     /^(([^<>()\[\]\.,;:\s@"]+(\.[^<>()\[\]\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                  message: 'Enter a valid email',
+                  message: 'Email is not valid',
                 },
               })}
             />

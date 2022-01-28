@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import React, { useState, useEffect } from 'react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { FcGoogle } from 'react-icons/fc';
+import { GoogleLogin } from 'react-google-login';
 import {
   FormLabel,
   FormControl,
@@ -21,7 +22,10 @@ import {
   InputGroup,
   Tooltip,
 } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { authenticate, isAuth } from '../Helpers/auth';
+import { TokenExpiredError } from 'jsonwebtoken';
 
 const AlertPop = (props) => {
   return (
@@ -37,6 +41,7 @@ const AlertPop = (props) => {
 const Login = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const toast = useToast();
+  let navigate = useNavigate();
 
   const {
     handleSubmit,
@@ -46,59 +51,61 @@ const Login = () => {
   } = useForm();
 
   const onSubmit = (data) => {
-    // toast({
-    //   title: 'Signup Successful',
-    //   status: 'success',
-    //   duration: 2000,
-    // });
-    console.log(data);
-
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    };
-    fetch('/api/login', requestOptions)
-      .then(async (response) => {
-        const isJson = response.headers
-          .get('content-type')
-          ?.includes('application/json');
-        const serverResponse = isJson && (await response.json());
-        if (
-          serverResponse.status === 'error' &&
-          serverResponse.at === 'email'
-        ) {
-          setError('email', {
-            type: 'server',
-            message: serverResponse.error,
-          });
-          console.log(setError);
-          toast({
-            title: serverResponse.error,
-            status: 'error',
-            duration: 2000,
-          });
-        }
-        if (
-          serverResponse.status === 'error' &&
-          serverResponse.at === 'password'
-        ) {
+    axios
+      .post('/api/login', data)
+      .then((res) => {
+        toast({
+          title: 'Login Successful',
+          status: 'success',
+          duration: 2000,
+        });
+      })
+      .catch((err) => {
+        // setValue({});
+        console.log(err);
+        if (err.response.data.at == 'password') {
           setError('password', {
             type: 'server',
-            message: serverResponse.error,
-          });
-          console.log(setError);
-          toast({
-            title: serverResponse.error,
-            status: 'error',
-            duration: 3000,
+            message: err.response.data.errors,
           });
         }
-      })
-      .catch((error) => {
-        // setError({ responseErrorMessage: error.toString() });
-        console.error('There was an error!', error);
+        if (err.response.data.at == 'email') {
+          setError('email', {
+            type: 'server',
+            message: err.response.data.errors,
+          });
+        }
       });
+  };
+  //successfully loged in then redirected to home
+  const informParent = (response) => {
+    authenticate(response, () => {
+      navigate('/dashboard');
+      // isAuth() && isAuth().role === 'admin'
+      //   ? history.push('/admin')
+      //   : history.push('/private');
+    });
+  };
+  const googleSuccess = (tokenId) => {
+    axios
+      .post('/api/googlelogin', {
+        idToken: tokenId.tokenId,
+      })
+      .then((res) => {
+        console.log(res.data);
+        informParent(res);
+      })
+      .catch((err) => {
+        toast({
+          title: 'Google Login Error',
+          status: 'error',
+          duration: 3000,
+        });
+      });
+  };
+
+  const googleFailure = (response) => {
+    console.log(response);
   };
 
   return (
@@ -119,28 +126,37 @@ const Login = () => {
             Login
           </Heading>
           <Center py={[2, 2, 4]} w={'full'}>
-            <Button
-              px={16}
-              border={'none'}
-              borderRadius={'0'}
-              w={{ base: '15rem', sm: '18rem', md: '25rem' }}
-              h={'3.5em'}
-              maxW={'md'}
-              variant={'outline'}
-              leftIcon={<FcGoogle size='1.85em' />}
-              bg={'white'}
-              _hover={{
-                bgColor: 'gray.100',
-              }}
-            >
-              <Center
-                fontWeight={'500'}
-                fontSize={{ base: 'md', md: 'lg' }}
-                pl={'0.5rem'}
-              >
-                <Text textColor={'gray.500'}>login with Google</Text>
-              </Center>
-            </Button>
+            <GoogleLogin
+              clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+              onSuccess={googleSuccess}
+              onFailure={googleFailure}
+              cookiePolicy={'single_host_origin'}
+              render={(renderProps) => (
+                <Button
+                  px={16}
+                  border={'none'}
+                  borderRadius={'0'}
+                  w={{ base: '15rem', sm: '18rem', md: '25rem' }}
+                  h={'3.5em'}
+                  maxW={'md'}
+                  variant={'outline'}
+                  leftIcon={<FcGoogle size='1.85em' />}
+                  bg={'white'}
+                  _hover={{
+                    bgColor: 'gray.100',
+                  }}
+                  onClick={renderProps.onClick}
+                >
+                  <Center
+                    fontWeight={'500'}
+                    fontSize={{ base: 'md', md: 'lg' }}
+                    pl={'0.5rem'}
+                  >
+                    <Text textColor={'gray.500'}>login with Google</Text>
+                  </Center>
+                </Button>
+              )}
+            />
           </Center>
           <Text fontSize={'sm'}> or login with registered email </Text>
         </Center>
@@ -231,7 +247,7 @@ const Login = () => {
             Login
           </Button>
         </form>
-        <Link to='/reset-password'>
+        <Link to='/users/password/forget'>
           <Text fontSize={'sm'} py={'1rem'}>
             {' '}
             Forgot Password{' '}

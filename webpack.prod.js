@@ -7,7 +7,7 @@ const outputDirectory = 'dist';
 module.exports = merge(common, {
   mode: 'production',
   output: {
-    filename: 'bundle.[contentHash].js',
+    filename: 'bundle.[contenthash].js',
     path: path.join(__dirname, outputDirectory),
   },
   devtool: 'source-map',

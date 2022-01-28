@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, Center } from '@chakra-ui/react';
 import theme from './Theme';
 import NavBar from './Components/NavBar/Nav';
 import Home from './Pages/Home';
@@ -8,6 +8,9 @@ import Course from './Pages/Course';
 import Login from './Pages/Login';
 import Signup from './Pages/Signup';
 import ForgotPassword from './Pages/ForgotPassword';
+import ResetPassword from './Pages/ResetPassword';
+import Activate from './Pages/Activate';
+import Dashboard from './Pages/Dashboard';
 
 export const newTheme = {
   ...theme,
@@ -15,12 +18,7 @@ export const newTheme = {
   colors: { ...theme.colors, primary: '#ffffff' },
 };
 const App = () => {
-  // const [name, setName] = useState('Loading...');
-  // useEffect(() => {
-  //   fetch('/api/getUsername')
-  //     .then((res) => res.json())
-  //     .then((res) => setName(res.username));
-  // });
+  const [isAuth, setIsAuth] = useState(false);
 
   return (
     <ChakraProvider theme={newTheme}>
@@ -31,12 +29,32 @@ const App = () => {
         <Route path='/course' element={<Course />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Signup />} />
-        <Route path='/reset-password' element={<ForgotPassword />} />
-        {/*     <Route path='/price-list' element={<PriceList />} />
-         <Route path='/contact' element={<ContactUS />} />
-        <Route path='/book-collection' element={<BookCollection />} />
-    <Route path='/terms' element={<Terms />} />
-    <Route component={<NotFound />} />*/}
+        <Route path='/users/activate/:token' element={<Activate />} />
+        <Route
+          path='/dashboard'
+          element={isAuth ? <Dashboard /> : <Navigate replace to='/login' />}
+        />
+        <Route path='/users/password/forget' element={<ForgotPassword />} />
+        <Route
+          path='/users/password/reset/:token'
+          element={<ResetPassword />}
+        />{' '}
+        <Route
+          path='*'
+          element={
+            <Center
+              fontSize={{ base: '5xl', md: '7xl', lg: '9xl' }}
+              h={'60vh'}
+              fontWeight={'700'}
+              flexDir={'column'}
+            >
+              404
+              <Center fontSize={'2xl'} fontWeight={'400'}>
+                Page Not found
+              </Center>
+            </Center>
+          }
+        />
       </Routes>
     </ChakraProvider>
   );

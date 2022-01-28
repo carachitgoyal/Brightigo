@@ -2,8 +2,12 @@ import { Box } from '@chakra-ui/react';
 import React from 'react';
 import LayoutHOC from '../Components/HOC/Layout.HOC';
 import HeroImage from '../../../public/Images/hero1.jpg';
+import { useLocation } from 'react-router-dom';
 
 const Home = () => {
+  const location = useLocation();
+  console.log('state - ', location.state);
+  
   return (
     <>
       <LayoutHOC

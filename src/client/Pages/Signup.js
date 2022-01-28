@@ -1,7 +1,8 @@
 import { useForm } from 'react-hook-form';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { FcGoogle } from 'react-icons/fc';
+import { GoogleLogin } from 'react-google-login';
 import {
   FormLabel,
   FormControl,
@@ -21,7 +22,9 @@ import {
   InputGroup,
   Tooltip,
 } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { isAuth, authenticate } from '../Helpers/auth';
+import axios from 'axios';
 
 const AlertPop = (props) => {
   return (
@@ -37,49 +40,79 @@ const AlertPop = (props) => {
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const toast = useToast();
+  let navigate = useNavigate();
 
   const {
     handleSubmit,
     register,
     setError,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({ defaultValues: { email: '' } });
 
-  const onSubmit = (data) => {
-    // toast({
-    //   title: 'Signup Successful',
-    //   status: 'success',
-    //   duration: 2000,
-    // });
-    console.log(data);
+  const informParent = (response) => {
+    authenticate(response, () => {
+      navigate('/home');
+      // isAuth() && isAuth().role === 'admin'
+      //   ? history.push('/admin')
+      //   : history.push('/private');
+    });
+  };
 
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    };
-    fetch('/api/createUser', requestOptions)
-      .then(async (response) => {
-        const isJson = response.headers
-          .get('content-type')
-          ?.includes('application/json');
-        const serverResponse = isJson && (await response.json());
-        if (serverResponse.status === 'error') {
-          setError('email', {
-            type: 'server',
-            message: serverResponse.error,
-          });
-          console.log(setError);
-          toast({
-            title: serverResponse.error,
-            status: 'error',
-            duration: 2000,
-          });
-        }
+  const googleSuccess = (tokenId) => {
+    axios
+      .post('/api/googlelogin', {
+        idToken: tokenId.tokenId,
       })
-      .catch((error) => {
-        // setError({ responseErrorMessage: error.toString() });
-        console.error('There was an error!', error);
+      .then((res) => {
+        toast({
+          title: 'Google Signin Successful',
+          status: 'success',
+          duration: 3000,
+        });
+        navigate('/home', { state: res.data });
+      })
+      .catch((err) => {
+        console.log(err);
+        toast({
+          title: 'Google Login Error',
+          status: 'error',
+          duration: 3000,
+        });
+      });
+  };
+
+  const googleFailure = async (response) => {
+    toast({
+      title: 'Google Failure',
+      status: 'error',
+      duration: 3000,
+    });
+  };
+
+  const onSubmit = (data) => {
+    axios
+      .post('/api/register', data)
+      .then((res) => {
+        //setValue({});
+        toast({
+          title: res.data.message,
+          status: 'success',
+          duration: 2000,
+        });
+        navigate('/home');
+      })
+      .catch((err) => {
+        // setValue({});
+        setError('email', {
+          type: 'server',
+          message: err.response.data.errors,
+        });
+        toast({
+          title: err.response.data.errors,
+          status: 'error',
+          duration: 2000,
+        });
       });
   };
 
@@ -95,33 +128,46 @@ const Signup = () => {
       borderBottom={'3px solid'}
       borderColor={'purple.800'}
     >
+      {/*  {isAuth() ? <Navigate replace to='/' /> : null}*/}
       <VStack p={['1rem', '1rem', '2rem']} pb={'4rem'} bgColor={'#fefbff'}>
         <Center my={'1rem'} flexDirection={'column'}>
           <Heading fontWeight={'400'} mb={'0.5rem'} letterSpacing={'wider'}>
             Signup
           </Heading>
           <Center py={[2, 2, 4]} w={'full'}>
-            <Button
-              px={16}
-              border={'none'}
-              borderRadius={'0'}
-              w={{ base: '15rem', sm: '18rem', md: '25rem' }}
-              h={'3.5em'}
-              maxW={'md'}
-              variant={'outline'}
-              leftIcon={<FcGoogle size='1.85em' />}
-              bg={'white'}
-            >
-              <Center
-                fontWeight={'500'}
-                fontSize={{ base: 'md', md: 'lg' }}
-                pl={'0.5rem'}
-              >
-                <Text textColor={'gray.500'}>Signup with Google</Text>
-              </Center>
-            </Button>
+            <GoogleLogin
+              clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+              onSuccess={googleSuccess}
+              onFailure={googleFailure}
+              cookiePolicy={'single_host_origin'}
+              render={(renderProps) => (
+                <Button
+                  px={16}
+                  border={'none'}
+                  borderRadius={'0'}
+                  w={{ base: '15rem', sm: '18rem', md: '25rem' }}
+                  h={'3.5em'}
+                  maxW={'md'}
+                  variant={'outline'}
+                  leftIcon={<FcGoogle size='1.85em' />}
+                  bg={'white'}
+                  _hover={{
+                    bgColor: 'gray.100',
+                  }}
+                  onClick={renderProps.onClick}
+                >
+                  <Center
+                    fontWeight={'500'}
+                    fontSize={{ base: 'md', md: 'lg' }}
+                    pl={'0.5rem'}
+                  >
+                    <Text textColor={'gray.500'}>Signup with Google</Text>
+                  </Center>
+                </Button>
+              )}
+            />
           </Center>
-          <Text fontSize={'sm'}> or Signup with registered email </Text>
+          <Text fontSize={'sm'}> or Signup with email </Text>
         </Center>
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormControl
@@ -137,7 +183,7 @@ const Signup = () => {
               bg={'white'}
               size={'lg'}
               borderRadius={'0'}
-              {...register('username', {
+              {...register('name', {
                 required: 'Please enter Password',
                 minLength: { value: 4, message: 'Too Short' },
               })}
@@ -244,6 +290,7 @@ const Signup = () => {
             }}
             isLoading={isSubmitting}
           >
+            {isSubmitting && <Text>Submitting</Text>}
             Get Started
           </Button>
         </form>

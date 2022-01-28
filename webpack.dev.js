@@ -9,7 +9,6 @@ module.exports = merge(common, {
     filename: 'bundle.js',
     path: path.join(__dirname, outputDirectory),
   },
-  // debug: true,
   devtool: 'eval-cheap-module-source-map',
   resolve: {
     extensions: ['*', '.js', '.jsx'],
@@ -17,7 +16,10 @@ module.exports = merge(common, {
   devServer: {
     port: 3000,
     open: false,
-    historyApiFallback: true,
+    hot: true,
+    historyApiFallback: {
+      disableDotRule: true,
+    },
     proxy: {
       '/api': 'http://localhost:8080',
     },
