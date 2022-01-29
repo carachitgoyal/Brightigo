@@ -12,6 +12,7 @@ import { Link, NavigationType, useNavigate } from 'react-router-dom';
 import UserProfile from './UserProfile';
 import { isAuth } from '../../Helpers/auth';
 import { useLocation } from 'react-router';
+import Logo from '../Logo';
 
 const NavBar = (props) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -30,14 +31,9 @@ const NavBar = (props) => {
       borderBottom={{ base: isOpen ? '3px solid black' : '0', md: '0' }}
     >
       <NavBarContainer {...props}>
-        <Text
-          fontSize={'2xl'}
-          fontWeight={'700'}
-          color={'purple.900'}
-          display={{ base: 'none', md: 'block' }}
-        >
-          BRIGHTIGO
-        </Text>
+        <Center display={{ base: 'none', md: 'block' }}>
+          <Logo />
+        </Center>
         {isAuth() && isSmallScreen ? (
           <UserProfile name={isAuth()?.name} />
         ) : (

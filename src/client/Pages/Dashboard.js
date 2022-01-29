@@ -1,12 +1,8 @@
-import { Center, Heading } from '@chakra-ui/react';
 import React from 'react';
+import Dashboard from '../Components/Dashboard/Dashboard';
 
-const Dashboard = () => {
-  return (
-    <Center>
-      <Heading>Welcome to Dashboard</Heading>
-    </Center>
-  );
+const DashboardWrapper = () => {
+  return <Dashboard />;
 };
 
-export default Dashboard;
+export default DashboardWrapper;

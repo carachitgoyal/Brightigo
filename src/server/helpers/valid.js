@@ -1,4 +1,5 @@
 const { check } = require('express-validator');
+
 exports.validRegister = [
   check('name', 'Name is required')
     .notEmpty()

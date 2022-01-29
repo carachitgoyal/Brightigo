@@ -13,6 +13,7 @@ import Activate from './Pages/Activate';
 import Dashboard from './Pages/Dashboard';
 import AppState from './Context/userAuth-state';
 import { isAuth } from './Helpers/auth';
+import Footer from './Components/Footer/Footer';
 
 export const newTheme = {
   ...theme,
@@ -68,6 +69,7 @@ const App = () => {
             }
           />
         </Routes>
+        <Footer />
       </ChakraProvider>
     </AppState>
   );
