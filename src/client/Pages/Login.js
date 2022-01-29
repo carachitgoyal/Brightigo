@@ -22,9 +22,9 @@ import {
   InputGroup,
   Tooltip,
 } from '@chakra-ui/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
-import { authenticate, isAuth } from '../Helpers/auth';
+import { authenticate, isAuth, updateUser } from '../Helpers/auth';
 import { TokenExpiredError } from 'jsonwebtoken';
 
 const AlertPop = (props) => {
@@ -59,6 +59,9 @@ const Login = () => {
           status: 'success',
           duration: 2000,
         });
+        //successfully logedin
+        authenticate(res);
+        navigate('/dashboard');
       })
       .catch((err) => {
         // setValue({});
@@ -77,25 +80,24 @@ const Login = () => {
         }
       });
   };
-  //successfully loged in then redirected to home
-  const informParent = (response) => {
-    authenticate(response, () => {
-      navigate('/dashboard');
-      // isAuth() && isAuth().role === 'admin'
-      //   ? history.push('/admin')
-      //   : history.push('/private');
-    });
-  };
+
   const googleSuccess = (tokenId) => {
     axios
       .post('/api/googlelogin', {
         idToken: tokenId.tokenId,
       })
       .then((res) => {
-        console.log(res.data);
-        informParent(res);
+        toast({
+          title: 'Google Login Success',
+          status: 'success',
+          duration: 3000,
+        });
+        //successfully logedin
+        authenticate(res);
+        navigate('/dashboard');
       })
       .catch((err) => {
+        console.log(err);
         toast({
           title: 'Google Login Error',
           status: 'error',
@@ -120,6 +122,7 @@ const Login = () => {
       borderBottom={'3px solid'}
       borderColor={'purple.800'}
     >
+      {isAuth() ? <Navigate replace to='/home' /> : null}
       <VStack p={['1rem', '1rem', '2rem']} pb={'4rem'} bgColor={'#fefbff'}>
         <Center my={'1rem'} flexDirection={'column'}>
           <Heading fontWeight={'400'} mb={'0.5rem'} letterSpacing={'wider'}>

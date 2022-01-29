@@ -9,24 +9,22 @@ import {
   VStack,
   useToast,
 } from '@chakra-ui/react';
-import { Link, Navigate, useParams } from 'react-router-dom';
-import { authenticate, isAuth } from '../Helpers/auth';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { authenticate, isAuth, updateUser } from '../Helpers/auth';
 import axios from 'axios';
 
 const Activate = () => {
   const [formData, setFormData] = useState({ name: '', token: '', show: true });
+  const navigate = useNavigate();
   const toast = useToast();
   let { token } = useParams();
 
   useEffect(() => {
     const theToken = token;
     let { name } = jwt.decode(token);
-
     if (theToken) {
       setFormData({ ...formData, name, theToken });
     }
-
-    console.log('token,  ' + theToken + ' name -' + name);
   }, []);
 
   const { name, theToken, show } = formData;
@@ -42,12 +40,13 @@ const Activate = () => {
           ...formData,
           show: false,
         });
-        console.log(res);
         toast({
           title: res.data.message,
           status: 'success',
           duration: 2000,
         });
+        authenticate(res);
+        navigate('/dashboard');
       })
       .catch((err) => {
         console.log('error is ' + err);
@@ -71,7 +70,6 @@ const Activate = () => {
       borderBottom={'3px solid'}
       borderColor={'purple.800'}
     >
-      {isAuth() ? <Navigate replace to='/' /> : null}
       <VStack p={['1rem', '1rem', '2rem']} pb={'4rem'} bgColor={'#fefbff'}>
         <Center my={'1rem'} flexDirection={'column'}>
           <Heading fontWeight={'400'} mb={'0.5rem'} letterSpacing={'wider'}>

@@ -11,6 +11,8 @@ import ForgotPassword from './Pages/ForgotPassword';
 import ResetPassword from './Pages/ResetPassword';
 import Activate from './Pages/Activate';
 import Dashboard from './Pages/Dashboard';
+import AppState from './Context/userAuth-state';
+import { isAuth } from './Helpers/auth';
 
 export const newTheme = {
   ...theme,
@@ -18,45 +20,56 @@ export const newTheme = {
   colors: { ...theme.colors, primary: '#ffffff' },
 };
 const App = () => {
-  const [isAuth, setIsAuth] = useState(false);
-
   return (
-    <ChakraProvider theme={newTheme}>
-      <NavBar />
-      <Routes>
-        <Route path='/' element={<Navigate replace to='/course' />} />
-        <Route path='/home' element={<Home />} />
-        <Route path='/course' element={<Course />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Signup />} />
-        <Route path='/users/activate/:token' element={<Activate />} />
-        <Route
-          path='/dashboard'
-          element={isAuth ? <Dashboard /> : <Navigate replace to='/login' />}
-        />
-        <Route path='/users/password/forget' element={<ForgotPassword />} />
-        <Route
-          path='/users/password/reset/:token'
-          element={<ResetPassword />}
-        />{' '}
-        <Route
-          path='*'
-          element={
-            <Center
-              fontSize={{ base: '5xl', md: '7xl', lg: '9xl' }}
-              h={'60vh'}
-              fontWeight={'700'}
-              flexDir={'column'}
-            >
-              404
-              <Center fontSize={'2xl'} fontWeight={'400'}>
-                Page Not found
+    <AppState>
+      <ChakraProvider theme={newTheme}>
+        <NavBar />
+        <Routes>
+          <Route
+            path='/'
+            element={
+              isAuth() ? (
+                <Navigate replace to='/dashboard' />
+              ) : (
+                <Navigate replace to='/course' />
+              )
+            }
+          />
+          <Route path='/home' element={<Home />} />
+          <Route path='/course' element={<Course />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Signup />} />
+          <Route path='/users/activate/:token' element={<Activate />} />
+          <Route
+            path='/dashboard'
+            element={
+              isAuth() ? <Dashboard /> : <Navigate replace to='/login' />
+            }
+          />
+          <Route path='/users/password/forget' element={<ForgotPassword />} />
+          <Route
+            path='/users/password/reset/:token'
+            element={<ResetPassword />}
+          />{' '}
+          <Route
+            path='*'
+            element={
+              <Center
+                fontSize={{ base: '5xl', md: '7xl', lg: '9xl' }}
+                h={'60vh'}
+                fontWeight={'700'}
+                flexDir={'column'}
+              >
+                404
+                <Center fontSize={'2xl'} fontWeight={'400'}>
+                  Page Not found
+                </Center>
               </Center>
-            </Center>
-          }
-        />
-      </Routes>
-    </ChakraProvider>
+            }
+          />
+        </Routes>
+      </ChakraProvider>
+    </AppState>
   );
 };
 

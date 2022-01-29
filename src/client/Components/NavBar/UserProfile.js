@@ -10,7 +10,11 @@ import {
 } from '@chakra-ui/react';
 import React from 'react';
 import { MdLogout } from 'react-icons/md';
-const UserProfile = () => {
+import { useNavigate } from 'react-router-dom';
+import { signout } from '../../Helpers/auth';
+
+const UserProfile = (props) => {
+  const navigate = useNavigate();
   return (
     <Flex alignItems={'center'} textColor={'purple.900'}>
       <Menu>
@@ -44,13 +48,14 @@ const UserProfile = () => {
           <MenuDivider />
           <MenuItem
             onClick={() => {
-              window.alert('Logout');
+              signout();
+              navigate('/login');
             }}
             _focus={{ bgColor: 'purple.800', textColor: 'white' }}
             _hover={{ bgColor: 'purple.800', textColor: 'white' }}
             icon={<MdLogout />}
           >
-            Logout
+            Logout @{props.name}
           </MenuItem>
         </MenuList>
       </Menu>

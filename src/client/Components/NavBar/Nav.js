@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Flex,
@@ -10,20 +10,24 @@ import {
 } from '@chakra-ui/react';
 import { Link, NavigationType, useNavigate } from 'react-router-dom';
 import UserProfile from './UserProfile';
+import { isAuth } from '../../Helpers/auth';
+import { useLocation } from 'react-router';
 
 const NavBar = (props) => {
   const [isOpen, setIsOpen] = React.useState(false);
-
-  const isLogedIn = false;
-
   const [isSmallScreen] = useMediaQuery('(max-width: 768px)');
 
   const toggle = () => setIsOpen(!isOpen);
+  const location = useLocation();
+
+  useEffect(() => {
+    isAuth();
+  }, [location.key]);
 
   return (
     <Center
       bg={'purple.50'}
-      borderBottom={{ md: isOpen ? '3px solid black' : '0', md: '0' }}
+      borderBottom={{ base: isOpen ? '3px solid black' : '0', md: '0' }}
     >
       <NavBarContainer {...props}>
         <Text
@@ -34,28 +38,30 @@ const NavBar = (props) => {
         >
           BRIGHTIGO
         </Text>
-        {isLogedIn && isSmallScreen ? (
-          <UserProfile />
+        {isAuth() && isSmallScreen ? (
+          <UserProfile name={isAuth()?.name} />
         ) : (
-          <Button
-            display={{ base: 'block', md: 'none' }}
-            size='md'
-            rounded='none'
-            color={['primary.500', 'primary.500', 'white', 'white']}
-            bg={'purple.800'}
-            _hover={{
-              bg: '#FAF5FF',
-              outline: '2px solid #543B99',
-              color: '#543B99',
-            }}
-          >
-            Register
-          </Button>
+          <Link to='/register'>
+            <Button
+              display={{ base: 'block', md: 'none' }}
+              size='md'
+              rounded='none'
+              color={['primary.500', 'primary.500', 'white', 'white']}
+              bg={'purple.800'}
+              _hover={{
+                bg: '#FAF5FF',
+                outline: '2px solid #543B99',
+                color: '#543B99',
+              }}
+            >
+              Register
+            </Button>
+          </Link>
         )}
         <MenuToggle toggle={toggle} isOpen={isOpen} />
         <MenuLinks
           isOpen={isOpen}
-          isLogedIn={isLogedIn}
+          isAuth={isAuth}
           isSmallScreen={isSmallScreen}
         />
       </NavBarContainer>
@@ -103,7 +109,7 @@ const MenuItem = ({ children, isLast, to = '/', ...rest }) => {
   );
 };
 
-const MenuLinks = ({ isOpen, isLogedIn, isSmallScreen }) => {
+const MenuLinks = ({ isOpen, isAuth, isSmallScreen }) => {
   return (
     <Box
       display={{ base: isOpen ? 'block' : 'none', md: 'block' }}
@@ -120,29 +126,31 @@ const MenuLinks = ({ isOpen, isLogedIn, isSmallScreen }) => {
       >
         <MenuItem to='/home'>Home</MenuItem>
         <MenuItem to='/course'>Course </MenuItem>
-        {!isLogedIn && <MenuItem to='/login'>Login </MenuItem>}
-        {isLogedIn ? (
-          !isSmallScreen && <UserProfile />
+        {isAuth() ? (
+          !isSmallScreen && <UserProfile name={isAuth()?.name} />
         ) : (
-          <MenuItem
-            to='/register'
-            display={{ base: 'none', md: 'block' }}
-            isLast
-          >
-            <Button
-              size='lg'
-              rounded='0'
-              color={'white'}
-              bg={'purple.800'}
-              _hover={{
-                bg: '#FAF5FF',
-                outline: '2px solid #543B99',
-                color: '#543B99',
-              }}
+          <>
+            <MenuItem to='/login'>Login </MenuItem>
+            <MenuItem
+              to='/register'
+              display={{ base: 'none', md: 'block' }}
+              isLast
             >
-              Register
-            </Button>
-          </MenuItem>
+              <Button
+                size='lg'
+                rounded='0'
+                color={'white'}
+                bg={'purple.800'}
+                _hover={{
+                  bg: '#FAF5FF',
+                  outline: '2px solid #543B99',
+                  color: '#543B99',
+                }}
+              >
+                Register
+              </Button>
+            </MenuItem>{' '}
+          </>
         )}
       </Stack>
     </Box>

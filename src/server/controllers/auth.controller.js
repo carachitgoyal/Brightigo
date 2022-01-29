@@ -109,14 +109,13 @@ exports.activationController = (req, res) => {
         user.save((err, user) => {
           if (err) {
             console.log('Save error', errorHandler(err));
-
             return res.status(401).json({
               errors: errorHandler(err),
             });
           } else {
             return res.json({
               success: true,
-              message: user,
+              user: user,
               message: 'Signup success',
             });
           }
@@ -125,7 +124,7 @@ exports.activationController = (req, res) => {
     });
   } else {
     return res.json({
-      message: 'error happening please try again',
+      message: 'Error happening please try again',
     });
   }
 };

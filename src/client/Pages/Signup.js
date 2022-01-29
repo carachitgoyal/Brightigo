@@ -22,9 +22,9 @@ import {
   InputGroup,
   Tooltip,
 } from '@chakra-ui/react';
-import { Link, useNavigate } from 'react-router-dom';
-import { isAuth, authenticate } from '../Helpers/auth';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { isAuth, authenticate } from '../Helpers/auth';
 
 const AlertPop = (props) => {
   return (
@@ -46,18 +46,8 @@ const Signup = () => {
     handleSubmit,
     register,
     setError,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm({ defaultValues: { email: '' } });
-
-  const informParent = (response) => {
-    authenticate(response, () => {
-      navigate('/home');
-      // isAuth() && isAuth().role === 'admin'
-      //   ? history.push('/admin')
-      //   : history.push('/private');
-    });
-  };
 
   const googleSuccess = (tokenId) => {
     axios
@@ -70,7 +60,9 @@ const Signup = () => {
           status: 'success',
           duration: 3000,
         });
-        navigate('/home', { state: res.data });
+        //successfully logedin
+        authenticate(res);
+        navigate('/dashboard');
       })
       .catch((err) => {
         console.log(err);
@@ -100,10 +92,10 @@ const Signup = () => {
           status: 'success',
           duration: 2000,
         });
-        navigate('/home');
+        // on signup send message and redirect to login page
+        navigate('/login');
       })
       .catch((err) => {
-        // setValue({});
         setError('email', {
           type: 'server',
           message: err.response.data.errors,
@@ -128,7 +120,7 @@ const Signup = () => {
       borderBottom={'3px solid'}
       borderColor={'purple.800'}
     >
-      {/*  {isAuth() ? <Navigate replace to='/' /> : null}*/}
+      {isAuth() ? <Navigate replace to='/login' /> : null}
       <VStack p={['1rem', '1rem', '2rem']} pb={'4rem'} bgColor={'#fefbff'}>
         <Center my={'1rem'} flexDirection={'column'}>
           <Heading fontWeight={'400'} mb={'0.5rem'} letterSpacing={'wider'}>

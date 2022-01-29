@@ -10,6 +10,7 @@ export const setCookie = (key, value) => {
     });
   }
 };
+
 // remove from cookie
 export const removeCookie = (key) => {
   if (window !== 'undefined') {
@@ -41,12 +42,11 @@ export const removeLocalStorage = (key) => {
   }
 };
 
-// Auth enticate user by passing data to cookie and localstorage during signin
-export const authenticate = (response, next) => {
+// Authenticate user by passing data to cookie and localstorage during signin
+export const authenticate = (response) => {
   console.log('AUTHENTICATE HELPER ON SIGNIN RESPONSE', response);
   setCookie('token', response.data.token);
   setLocalStorage('user', response.data.user);
-  next();
 };
 
 // Access user info from localstorage
@@ -63,18 +63,16 @@ export const isAuth = () => {
   }
 };
 
-export const signout = (next) => {
+export const signout = () => {
   removeCookie('token');
   removeLocalStorage('user');
-  next();
 };
 
-export const updateUser = (response, next) => {
+export const updateUser = (response) => {
   console.log('UPDATE USER IN LOCALSTORAGE HELPERS', response);
   if (typeof window !== 'undefined') {
     let auth = JSON.parse(localStorage.getItem('user'));
     auth = response.data;
     localStorage.setItem('user', JSON.stringify(auth));
   }
-  next();
 };
