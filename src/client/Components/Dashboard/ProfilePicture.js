@@ -4,25 +4,27 @@ import { TiCamera } from 'react-icons/ti';
 import { useDropzone } from 'react-dropzone';
 
 const ProfilePicture = () => {
-  const [images, setImages] = useState([]);
+  const [image, setImage] = useState(
+    'https://www.smsffinancial.com.au/wp-content/uploads/2018/09/Avatar-Placeholder.jpg'
+  );
 
-  const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
-    acceptedFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImages((prevState) => [...prevState, reader.result]);
-      };
-      reader.readAsDataURL(file);
-    });
-  }, []);
+  const onDrop = useCallback((acceptedFiles) => {
+    const acceptedFile = acceptedFiles[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImage(reader.result);
+    };
+    reader.readAsDataURL(acceptedFile);
+  });
 
   useEffect(() => {
-    console.log('images array - ', images);
-  }, [images]);
+    console.log('image - ', image);
+  }, [image]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: 'image/png',
+    multiple: false,
   });
 
   return (
@@ -31,8 +33,8 @@ const ProfilePicture = () => {
         for='file'
         position={'absolute'}
         color={'white'}
-        w={'8rem'}
-        h={'8rem'}
+        w={{ base: '6rem', md: '8rem' }}
+        h={{ base: '6rem', md: '8rem' }}
         rounded={'full'}
         bg={'#ffffff70'}
         opacity={'0'}
@@ -44,17 +46,21 @@ const ProfilePicture = () => {
         {...getRootProps()}
       >
         <Input {...getInputProps()} />{' '}
-        <Center w={'8rem'} h={'8rem'}>
+        <Center
+          w={{ base: '6rem', md: '8rem' }}
+          h={{ base: '6rem', md: '8rem' }}
+        >
           <TiCamera size={40} />
         </Center>
       </FormLabel>
 
       <Image
         rounded={'full'}
-        w={'8rem'}
-        h={'8rem'}
+        w={{ base: '6rem', md: '8rem' }}
+        h={{ base: '6rem', md: '8rem' }}
         fit={'cover'}
-        src={images[1]}
+        alt='user profile'
+        src={image}
       />
     </Box>
   );
