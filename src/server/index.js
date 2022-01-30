@@ -19,10 +19,11 @@ mongoose
 
 //Load all routes
 const authRouter = require('./routes/auth.routes');
+const userRouter = require('./routes/user.routes');
 
 app.use('/', express.static('dist'));
-
 app.use('/api', authRouter);
+app.use('/api', userRouter);
 
 app.listen(process.env.PORT || 8080, () => {
   console.log(`Listening on port ${process.env.PORT || 8080}!`);

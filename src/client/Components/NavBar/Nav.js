@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Flex,
@@ -13,11 +13,13 @@ import UserProfile from './UserProfile';
 import { isAuth } from '../../Helpers/auth';
 import { useLocation } from 'react-router';
 import Logo from '../Logo';
+import axios from 'axios';
 
 const NavBar = (props) => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [isSmallScreen] = useMediaQuery('(max-width: 768px)');
 
+  console.log(isAuth()?.profilePicture);
   const toggle = () => setIsOpen(!isOpen);
   const location = useLocation();
 
@@ -35,7 +37,10 @@ const NavBar = (props) => {
           <Logo />
         </Center>
         {isAuth() && isSmallScreen ? (
-          <UserProfile name={isAuth()?.name} />
+          <UserProfile
+            profilePicture={isAuth()?.profilePicture}
+            name={isAuth()?.name}
+          />
         ) : (
           <Link to='/register'>
             <Button
@@ -56,6 +61,7 @@ const NavBar = (props) => {
         )}
         <MenuToggle toggle={toggle} isOpen={isOpen} />
         <MenuLinks
+          profilePicture={isAuth()?.profilePicture}
           isOpen={isOpen}
           isAuth={isAuth}
           isSmallScreen={isSmallScreen}
@@ -105,7 +111,7 @@ const MenuItem = ({ children, isLast, to = '/', ...rest }) => {
   );
 };
 
-const MenuLinks = ({ isOpen, isAuth, isSmallScreen }) => {
+const MenuLinks = ({ isOpen, profilePicture, isAuth, isSmallScreen }) => {
   return (
     <Box
       display={{ base: isOpen ? 'block' : 'none', md: 'block' }}
@@ -123,7 +129,12 @@ const MenuLinks = ({ isOpen, isAuth, isSmallScreen }) => {
         <MenuItem to='/home'>Home</MenuItem>
         <MenuItem to='/course'>Course </MenuItem>
         {isAuth() ? (
-          !isSmallScreen && <UserProfile name={isAuth()?.name} />
+          !isSmallScreen && (
+            <UserProfile
+              profilePicture={profilePicture}
+              name={isAuth()?.name}
+            />
+          )
         ) : (
           <>
             <MenuItem to='/login'>Login </MenuItem>

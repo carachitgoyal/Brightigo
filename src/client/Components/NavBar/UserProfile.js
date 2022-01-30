@@ -16,7 +16,7 @@ import { signout } from '../../Helpers/auth';
 const UserProfile = (props) => {
   const navigate = useNavigate();
   return (
-    <Flex alignItems={'center'} textColor={'purple.900'}>
+    <Flex alignItems={'center'} textColor={'purple.900'} zIndex={'100'}>
       <Menu>
         <MenuButton
           as={Button}
@@ -25,23 +25,24 @@ const UserProfile = (props) => {
           cursor={'pointer'}
           minW={0}
         >
-          <Avatar
-            size={'md'}
-            src={
-              'https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
-            }
-          />
+          <Avatar size={'md'} src={props.profilePicture} />
         </MenuButton>
         <MenuList>
           <MenuItem
             _hover={{ bgColor: 'purple.800', textColor: 'white' }}
             _focus={{ bgColor: 'purple.800', textColor: 'white' }}
+            onClick={() => {
+              navigate('/dashboard');
+            }}
           >
             Dashboard
           </MenuItem>
           <MenuItem
             _focus={{ bgColor: 'purple.800', textColor: 'white' }}
             _hover={{ bgColor: 'purple.800', textColor: 'white' }}
+            onClick={() => {
+              navigate('/dashboard');
+            }}
           >
             Profile
           </MenuItem>
@@ -55,7 +56,7 @@ const UserProfile = (props) => {
             _hover={{ bgColor: 'purple.800', textColor: 'white' }}
             icon={<MdLogout />}
           >
-            Logout @{props.name}
+            Logout
           </MenuItem>
         </MenuList>
       </Menu>

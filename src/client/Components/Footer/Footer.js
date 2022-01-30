@@ -39,7 +39,7 @@ const Footer = () => {
             <Center w={{ base: '8rem', sm: '10rem', lg: '18rem' }}>
               <Logo />
             </Center>
-            <Link to='/register'>
+            {/*<Link to='/register'>
               <Center
                 bg={'purple.900'}
                 h={{ base: '2.2rem', sm: '3.5rem', lg: '3rem' }}
@@ -50,7 +50,7 @@ const Footer = () => {
               >
                 Apply Now
               </Center>
-            </Link>
+            </Link>*/}
           </HStack>
         </Flex>
         <Stack
