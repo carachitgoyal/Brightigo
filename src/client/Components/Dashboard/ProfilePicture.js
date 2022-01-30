@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { TiCamera } from 'react-icons/ti';
 import { useDropzone } from 'react-dropzone';
 
-const ProfilePicture = () => {
+const ProfilePicture = ({ sendDataToParent }) => {
   const [image, setImage] = useState(
     'https://www.smsffinancial.com.au/wp-content/uploads/2018/09/Avatar-Placeholder.jpg'
   );
@@ -18,10 +18,10 @@ const ProfilePicture = () => {
   });
 
   useEffect(() => {
-    console.log('image - ', image);
+    sendDataToParent(image);
   }, [image]);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: 'image/png',
     multiple: false,

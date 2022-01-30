@@ -15,11 +15,13 @@ import {
 } from '@chakra-ui/react';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
-import { authenticate, isAuth, updateUser } from '../../Helpers/auth';
+import { isAuth, updateUser } from '../../Helpers/auth';
 import ProfilePicture from './ProfilePicture';
 
 const EditProfile = ({ editMode, setEditMode }) => {
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [profilePicture, setProfilePicture] = useState(
+    'https://www.smsffinancial.com.au/wp-content/uploads/2018/09/Avatar-Placeholder.jpg'
+  );
   const { email, name } = isAuth();
   const toast = useToast();
   let navigate = useNavigate();
@@ -27,8 +29,7 @@ const EditProfile = ({ editMode, setEditMode }) => {
   const {
     handleSubmit,
     register,
-    setError,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm({
     defaultValues: {
       name: name,
@@ -37,35 +38,41 @@ const EditProfile = ({ editMode, setEditMode }) => {
     },
   });
 
+  const changeProfilePictureHandler = (image) => {
+    setProfilePicture(image);
+  };
+
   const onSubmit = (data) => {
-    axios
-      .post('/api/123', data)
-      .then((res) => {
-        toast({
-          title: 'Login Successful',
-          status: 'success',
-          duration: 2000,
-        });
-        //successfully logedin
-        authenticate(res);
-        navigate('/dashboard');
-      })
-      .catch((err) => {
-        // setValue({});
-        console.log(err);
-        if (err.response.data.at == 'password') {
-          setError('password', {
-            type: 'server',
-            message: err.response.data.errors,
-          });
-        }
-        if (err.response.data.at == 'email') {
-          setError('email', {
-            type: 'server',
-            message: err.response.data.errors,
-          });
-        }
-      });
+    Object.assign(data, { profilePicture: profilePicture });
+    console.log(data);
+    // axios
+    //   .post('/api/123', data)
+    //   .then((res) => {
+    //     toast({
+    //       title: 'Login Successful',
+    //       status: 'success',
+    //       duration: 2000,
+    //     });
+    //     //successfully logedin
+    //     authenticate(res);
+    //     navigate('/dashboard');
+    //   })
+    //   .catch((err) => {
+    //     // setValue({});
+    //     console.log(err);
+    //     if (err.response.data.at == 'password') {
+    //       setError('password', {
+    //         type: 'server',
+    //         message: err.response.data.errors,
+    //       });
+    //     }
+    //     if (err.response.data.at == 'email') {
+    //       setError('email', {
+    //         type: 'server',
+    //         message: err.response.data.errors,
+    //       });
+    //     }
+    //   });
   };
 
   return (
@@ -83,7 +90,7 @@ const EditProfile = ({ editMode, setEditMode }) => {
         spacing={'3rem'}
         mx={'auto'}
       >
-        <ProfilePicture />
+        <ProfilePicture sendDataToParent={changeProfilePictureHandler} />
         <Box
           w={{ base: '6rem', md: '10rem' }}
           as={'button'}
@@ -126,10 +133,8 @@ const EditProfile = ({ editMode, setEditMode }) => {
               borderRadius={'0'}
               {...register('name', {
                 required: 'Please enter Password',
-                minLength: { value: 4, message: 'Too Short' },
               })}
             />
-            {errors.name && <AlertPop title={errors.name.message} />}
           </FormControl>
           <FormControl
             pt={'1rem'}
@@ -137,6 +142,7 @@ const EditProfile = ({ editMode, setEditMode }) => {
           >
             <FormLabel fontSize={{ base: 'xl', md: '2xl' }}>Email</FormLabel>
             <Input
+              isDisabled
               mb={'1rem'}
               type='text'
               name='email'
@@ -144,18 +150,8 @@ const EditProfile = ({ editMode, setEditMode }) => {
               bg={'white'}
               size={'lg'}
               borderRadius={'0'}
-              {...register('email', {
-                required: 'Please enter registered email',
-                pattern: {
-                  value:
-                    /^(([^<>()\[\]\.,;:\s@"]+(\.[^<>()\[\]\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                  message: 'Enter a valid email',
-                },
-                //   validate: 'server',
-              })}
+              {...register('email')}
             />
-            {errors.email && <AlertPop title={errors.email.message} />}
-            {/*errors.email && <AlertPop title={errors.email} />*/}
           </FormControl>
           <FormControl
             pt={'1rem'}
@@ -169,26 +165,12 @@ const EditProfile = ({ editMode, setEditMode }) => {
               type='number'
               name='phoneNumber'
               placeholder='Phone Number'
-              value={''}
               bg={'white'}
               size={'lg'}
               borderRadius={'0'}
-              {...register('phoneNumber', {
-                required: 'Please enter registered phoneNumber',
-                pattern: {
-                  value:
-                    /^(([^<>()\[\]\.,;:\s@"]+(\.[^<>()\[\]\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                  message: 'Enter a valid phoneNumber',
-                },
-                //   validate: 'server',
-              })}
+              {...register('phoneNumber')}
             />
-            {errors.phoneNumber && (
-              <AlertPop title={errors.phoneNumber.message} />
-            )}
-            {/*errors.email && <AlertPop title={errors.email} />*/}
           </FormControl>
-
           <Button
             mt={'1rem'}
             type='submit'
