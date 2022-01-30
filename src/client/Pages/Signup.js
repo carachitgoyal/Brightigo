@@ -62,7 +62,7 @@ const Signup = () => {
         });
         //successfully logedin
         authenticate(res);
-        navigate('/dashboard');
+        navigate('/');
       })
       .catch((err) => {
         console.log(err);
@@ -92,16 +92,18 @@ const Signup = () => {
           status: 'success',
           duration: 2000,
         });
+
         // on signup send message and redirect to login page
         navigate('/login');
       })
       .catch((err) => {
+        console.log(err);
         setError('email', {
           type: 'server',
-          message: err.response.data.errors,
+          message: err.message,
         });
         toast({
-          title: err.response.data.errors,
+          title: err.message,
           status: 'error',
           duration: 2000,
         });

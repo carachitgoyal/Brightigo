@@ -15,6 +15,30 @@ const userScheama = new mongoose.Schema(
       trim: true,
       required: true,
     },
+    profilePicture: {
+      type: String,
+      default:
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1K8ypPsfNVQU8lVxl1i2_ajismMS_w6FA4Q&usqp=CAU',
+    },
+    phoneNumber: {
+      type: Number,
+    },
+    test: {
+      score: Number,
+      grade: String,
+      max: Number,
+      percentage: Number,
+      detailedData: [
+        {
+          name: String,
+          score: Number,
+          percentage: Number,
+          max: Number,
+          grade: Number,
+          description: Number,
+        },
+      ],
+    },
     hashed_password: {
       type: String,
       required: true,

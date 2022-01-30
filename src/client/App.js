@@ -32,7 +32,7 @@ const App = () => {
               isAuth() ? (
                 <Navigate replace to='/dashboard' />
               ) : (
-                <Navigate replace to='/course' />
+                <Navigate replace to='/' />
               )
             }
           />
